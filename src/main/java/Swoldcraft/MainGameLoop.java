@@ -1,5 +1,6 @@
 package Swoldcraft;
 
+import Entities.Camera;
 import Entities.Entity;
 import Models.RawModel;
 import Models.TexturedModel;
@@ -25,37 +26,96 @@ public class MainGameLoop {
         MasterRenderer renderer = new MasterRenderer(shader);
 
         float[] vertices = {
-                -0.5f, -0.5f, 0, //0 - bottom-left
-                -0.5f, 0.5f, 0, //1 - top-left
-                0.5f, 0.5f, 0, //2 - top-right
-                0.5f, -0.5f, 0 //3 - bottom-right
+                -0.5f,0.5f,-0.5f,
+                -0.5f,-0.5f,-0.5f,
+                0.5f,-0.5f,-0.5f,
+                0.5f,0.5f,-0.5f,
+
+                -0.5f,0.5f,0.5f,
+                -0.5f,-0.5f,0.5f,
+                0.5f,-0.5f,0.5f,
+                0.5f,0.5f,0.5f,
+
+                0.5f,0.5f,-0.5f,
+                0.5f,-0.5f,-0.5f,
+                0.5f,-0.5f,0.5f,
+                0.5f,0.5f,0.5f,
+
+                -0.5f,0.5f,-0.5f,
+                -0.5f,-0.5f,-0.5f,
+                -0.5f,-0.5f,0.5f,
+                -0.5f,0.5f,0.5f,
+
+                -0.5f,0.5f,0.5f,
+                -0.5f,0.5f,-0.5f,
+                0.5f,0.5f,-0.5f,
+                0.5f,0.5f,0.5f,
+
+                -0.5f,-0.5f,0.5f,
+                -0.5f,-0.5f,-0.5f,
+                0.5f,-0.5f,-0.5f,
+                0.5f,-0.5f,0.5f
         };
 
         int[] indices = {
-                0, 1, 3,
-                1, 2, 3
+                0,1,3,
+                3,1,2,
+                4,5,7,
+                7,5,6,
+                8,9,11,
+                11,9,10,
+                12,13,15,
+                15,13,14,
+                16,17,19,
+                19,17,18,
+                20,21,23,
+                23,21,22
         };
 
         float[] uv = {
-                0, 0,
-                0, 1,
-                1, 1,
-                1, 0
+                0,0,
+                0,1,
+                1,1,
+                1,0,
+                0,0,
+                0,1,
+                1,1,
+                1,0,
+                0,0,
+                0,1,
+                1,1,
+                1,0,
+                0,0,
+                0,1,
+                1,1,
+                1,0,
+                0,0,
+                0,1,
+                1,1,
+                1,0,
+                0,0,
+                0,1,
+                1,1,
+                1,0
         };
 
         RawModel model = loader.loadToVAO(vertices, indices, uv);
         ModelTexture texture = new ModelTexture(loader.loadTexture("dirtTex"));
         TexturedModel texModel = new TexturedModel(model, texture);
         Entity entity = new Entity(texModel, new Vector3f(0, 0, -1 ), 0 , 0 , 0, 1);
+        Camera camera = new Camera(new Vector3f(0, 0, 0), 0 ,0 ,0);
 
         while (!Display.isCloseRequested()) {
             renderer.prepare();
 
-            entity.addPosition(0, 0, -0.01f);
-            //entity.addRotation(0, 0, 0.1f);
-            //entity.addScale(-0.001f);
+            camera.move();
+
+            entity.addPosition(0, 0, 0);
+            entity.addRotation(0, 0, 0);
+            entity.addScale(0);
 
             shader.start();
+            shader.loadViewMatrix(camera);
             renderer.render(entity, shader);
             shader.stop();
 
