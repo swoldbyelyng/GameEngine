@@ -18,9 +18,9 @@ public class MasterRenderer {
         shader.stop();
     }
 
-    private static final float FOV = 70;
-    private static final float NEAR_PLANE = 0.1f;
-    private static final float FAR_PLANE = 10000f;
+    private static final float FOV = 90;
+    private static final float NEAR_PLANE = 0.01f;
+    private static final float FAR_PLANE = 20f;
 
     public void prepare() {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
