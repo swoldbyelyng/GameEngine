@@ -3,6 +3,8 @@ package Entities;
 import Models.TexturedModel;
 import org.lwjgl.util.vector.Vector3f;
 
+import java.util.Random;
+
 public class Entity {
 
     TexturedModel model;
