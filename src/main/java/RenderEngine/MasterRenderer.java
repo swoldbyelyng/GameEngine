@@ -24,7 +24,7 @@ public class MasterRenderer {
 
     StaticShader shader = new StaticShader();
     EntityRenderer entityRenderer = new EntityRenderer();
-    Map<TexturedModel, List<Entity>> entitiesMap = new HashMap<>();
+    Map<TexturedModel, List<Entity>> entitiesMap = new HashMap<TexturedModel, List<Entity>>();
 
     public MasterRenderer() {
         createProjectionMatrix();

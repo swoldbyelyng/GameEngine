@@ -23,10 +23,11 @@ public class MainGameLoop {
 
     public static Loader loader1 = null;
     public static StaticShader shader1 = null;
-    static List<Entity> entitiesList = Collections.synchronizedList(new ArrayList<Entity>());
+    static List<Chunk> chunksList = Collections.synchronizedList(new ArrayList<Chunk>());
     static Vector3f camPos = new Vector3f(0, 0, 0);
-    static List<Vector3f> occupiedPos = new ArrayList<Vector3f>();
-    static final int WORLD_SIZE = 75;
+    static List<Vector3f> occupiedChunkPos = new ArrayList<Vector3f>();
+    static final int WORLD_SIZE = 30;
+
 
     public static void main(String[] args) {
         DisplayManager.createDisplay();
@@ -40,75 +41,48 @@ public class MainGameLoop {
         ModelTexture texture = new ModelTexture(loader.loadTexture("pinkBlock"));
         TexturedModel texModel = new TexturedModel(model, texture);
 
-
         Camera camera = new Camera(new Vector3f(0, 0, 0), 0, 0, 0);
         camPos = camera.getPosition();
 
-        new Thread(() -> {
+        new Thread(() -> { //Thread-1
 
             while (!Display.isCloseRequested()) {
                 try {
-                    for (int x = (int) camPos.x; x < camPos.x + WORLD_SIZE; x++) {
-                        for (int z = (int) camPos.z - WORLD_SIZE; z < camPos.z; z++) {
-                            if (!occupiedPos.contains(new Vector3f(x, 0, z))) {
-                                entitiesList.add(new Entity(texModel, new Vector3f(x, 0, z), 0, 0, 0, 1));
-                                occupiedPos.add(new Vector3f(x, 0, z));
-                            }
-                        }
-                    }
-                    for (int x = (int) camPos.x; x < camPos.x + WORLD_SIZE; x++) {
-                        for (int z = (int) camPos.z; z < camPos.z + WORLD_SIZE; z++) {
-                            if (!occupiedPos.contains(new Vector3f(x, 0, z))) {
-                                entitiesList.add(new Entity(texModel, new Vector3f(x, 0, z), 0, 0, 0, 1));
-                                occupiedPos.add(new Vector3f(x, 0, z));
+                    for (int x = (int) (camPos.x - WORLD_SIZE) / 16; x < (camPos.x + WORLD_SIZE) / 16; x++) {
+                        for (int z = (int) (camPos.z - WORLD_SIZE) / 16; z < (camPos.z + WORLD_SIZE) / 16; z++) {
+
+                            if (!occupiedChunkPos.contains(new Vector3f(x * 16, 0, z * 16))) {
+                                List<Entity> blocks = new ArrayList<Entity>();
+
+                                for (int i = 0; i < 16; i++) {
+                                    for (int j = 0; j < 16; j++) {
+                                        blocks.add(new Entity(texModel, new Vector3f((x * 16) + i, 0, (z * 16) + j), 0, 0, 0, 1));
+                                    }
+                                }
+
+                                chunksList.add(new Chunk(blocks, new Vector3f(x * 16, 0, z * 16)));
+                                occupiedChunkPos.add(new Vector3f(x * 16, 0, z * 16));
                             }
                         }
                     }
                 } catch (Exception e) {
-                    System.out.println("Something went wring in Thread 1");
-                    System.exit(0);
+                    System.out.println("Something went wrong in thread-1");
+                    System.exit(-1);
                 }
             }
         }).start();
 
-        new Thread(() -> {
-            while (!Display.isCloseRequested()) {
-                try {
-                    for (int x = (int) camPos.x - WORLD_SIZE; x < camPos.x; x++) {
-                        for (int z = (int) camPos.z; z < camPos.z + WORLD_SIZE; z++) {
-                            if (!occupiedPos.contains(new Vector3f(x, 0, z))) {
-                                entitiesList.add(new Entity(texModel, new Vector3f(x, 0, z), 0, 0, 0, 1));
-                                occupiedPos.add(new Vector3f(x, 0, z));
-                            }
-                        }
-                    }
-                    for (int x = (int) camPos.x - WORLD_SIZE; x < camPos.x; x++) {
-                        for (int z = (int) camPos.z - WORLD_SIZE; z < camPos.z; z++) {
-                            if (!occupiedPos.contains(new Vector3f(x, 0, z))) {
-                                entitiesList.add(new Entity(texModel, new Vector3f(x, 0, z), 0, 0, 0, 1));
-                                occupiedPos.add(new Vector3f(x, 0, z));
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    System.out.println("Something went wrong in thread 2");
-                    System.exit(0);
-                }
-            }
-        }).start();
-
-        /*new Thread(() -> {
-
-        }).start(); */
 
         while (!Display.isCloseRequested()) {
             camera.move();
             camPos = camera.getPosition();
 
 
-            for (int i = 0; i < entitiesList.size(); i++) {
-                int distX = (int) (camPos.x - entitiesList.get(i).getPosition().x);
-                int distZ = (int) (camPos.z - entitiesList.get(i).getPosition().z);
+            for (int i = 0; i < chunksList.size(); i++) {
+
+                Vector3f origin = chunksList.get(i).getOrigin();
+                int distX = (int) (camPos.x - origin.x);
+                int distZ = (int) (camPos.z - origin.z);
 
                 if (distX < 0) {
                     distX = -distX;
@@ -116,11 +90,11 @@ public class MainGameLoop {
                 if (distZ < 0) {
                     distZ = -distZ;
                 }
-                if ((distX >= WORLD_SIZE) || (distZ <= WORLD_SIZE)) {
-                    masterRenderer.addEntity(entitiesList.get(i));
+                if ((distX <= WORLD_SIZE) || (distZ <= WORLD_SIZE)) {
+                    for (int j = 0; j < chunksList.get(i).getBlocks().size(); j++) {
+                        masterRenderer.addEntity(chunksList.get(i).getBlocks().get(j));
+                    }
                 }
-
-
             }
             masterRenderer.render(camera);
 
