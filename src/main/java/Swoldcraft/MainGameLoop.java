@@ -11,13 +11,11 @@ import RenderEngine.MasterRenderer;
 import Shaders.StaticShader;
 import Textures.ModelTexture;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
 public class MainGameLoop {
 
