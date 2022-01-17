@@ -25,17 +25,17 @@ public class ChunkMesh {
         uvList = new ArrayList<Float>();
         normalsList = new ArrayList<Float>();
 
-        //buildMesh();
+        buildMesh();
         populateLists();
     }
 
     public void update(Chunk chunk) {
         this.chunk = chunk;
 
-        //buildMesh();
+        buildMesh();
         populateLists();
     }
-/*
+
     private void buildMesh() {
         // Loop through block in chunk and determine which faces are visible
 
@@ -111,7 +111,7 @@ public class ChunkMesh {
 
         }
     }
-    */
+
 
     private void populateLists() {
         for(int i = 0; i < vertices.size(); i++){
@@ -136,6 +136,10 @@ public class ChunkMesh {
         }for(int i = 0; i < normalsList.size(); i++) {
             normals[i] = normalsList.get(i);
         }
+
+        positionList.clear();
+        uvList.clear();
+        normalsList.clear();
 
     }
 }

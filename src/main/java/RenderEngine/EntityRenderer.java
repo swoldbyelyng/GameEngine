@@ -32,7 +32,7 @@ public class EntityRenderer {
                 Matrix4f transformationMatrix = Maths.createTransformationMatrix(entity.getPosition(), entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
                 shader.loadTransformationMatrix(transformationMatrix);
 
-                GL11.glDrawElements(GL11.GL_TRIANGLES, entity.getModel().getModel().getIndexCount(), GL11.GL_UNSIGNED_INT, 0);
+                GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, model.getModel().getIndexCount());
 
             }
 
