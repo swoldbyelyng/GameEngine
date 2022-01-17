@@ -9,7 +9,7 @@ public class Camera {
     float rotX;
     float rotY;
     float rotZ;
-    float speed = 0.05f;
+    float speed = 0.4f;
     float mouseSensitivity = 0.1f;
     float forwardMove = 0;
     float lateralMove = 0;

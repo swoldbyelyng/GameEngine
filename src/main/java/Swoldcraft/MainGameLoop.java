@@ -5,6 +5,7 @@ import Chunks.ChunkMesh;
 import Cube.Block;
 import Entities.Camera;
 import Entities.Entity;
+import Models.AtlasCubeModel;
 import Models.CubeModel;
 import Models.RawModel;
 import Models.TexturedModel;
@@ -13,6 +14,7 @@ import RenderEngine.Loader;
 import RenderEngine.MasterRenderer;
 import Shaders.StaticShader;
 import Textures.ModelTexture;
+import Toolbox.PerlinNoiseGenerator;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -29,8 +31,9 @@ public class MainGameLoop {
     static List<Vector3f> occupiedChunkPos = new ArrayList<Vector3f>();
     static List<Entity> entities = new ArrayList<>();
 
-    static final int WORLD_CHUNKS = 5;
-    static final int WORLD_SIZE = ((16) * (WORLD_CHUNKS)) / 2;
+    static final int WORLD_CHUNKS = 10;
+    static final int CHUNK_SIZE = 32;
+    static final int WORLD_SIZE = ((CHUNK_SIZE) * (WORLD_CHUNKS)) / 2;
 
     static boolean closeDisplay = false;
 
@@ -43,32 +46,34 @@ public class MainGameLoop {
         MasterRenderer masterRenderer = new MasterRenderer();
 
         RawModel model = loader.loadToVAO(CubeModel.vertices, CubeModel.indices, CubeModel.uv);
-        ModelTexture texture = new ModelTexture(loader.loadTexture("pinkBlock"));
+        ModelTexture texture = new ModelTexture(loader.loadTexture("atlasTex"));
         TexturedModel texModel = new TexturedModel(model, texture);
 
         Camera camera = new Camera(new Vector3f(0, 0, 0), 0, 0, 0);
         camPos = camera.getPosition();
 
+        PerlinNoiseGenerator generator = new PerlinNoiseGenerator();
+
         new Thread(() -> { //Thread-1
 
             while (!Display.isCloseRequested()) {
                 try {
-                    for (int x = (int) (camPos.x - WORLD_SIZE) / 16; x < (camPos.x + WORLD_SIZE) / 16; x++) {
-                        for (int z = (int) (camPos.z - WORLD_SIZE) / 16; z < (camPos.z + WORLD_SIZE) / 16; z++) {
+                    for (int x = (int) (camPos.x - WORLD_SIZE) / CHUNK_SIZE; x < (camPos.x + WORLD_SIZE) / CHUNK_SIZE; x++) {
+                        for (int z = (int) (camPos.z - WORLD_SIZE) / CHUNK_SIZE; z < (camPos.z + WORLD_SIZE) / CHUNK_SIZE; z++) {
 
-                            if (!occupiedChunkPos.contains(new Vector3f(x * 16, 0, z * 16))) {
+                            if (!occupiedChunkPos.contains(new Vector3f(x * CHUNK_SIZE, 0, z * CHUNK_SIZE))) {
                                 List<Block> blocks = new ArrayList<Block>();
 
-                                for (int i = 0; i < 16; i++) {
-                                    for (int j = 0; j < 16; j++) {
-                                        blocks.add(new Block(i, 0, j, Block.TYPE.DIRT));
+                                for (int i = 0; i < CHUNK_SIZE; i++) {
+                                    for (int j = 0; j < CHUNK_SIZE; j++) {
+                                        blocks.add(new Block(i, (int) generator.generateHeight(i + (x * CHUNK_SIZE), j + (z * CHUNK_SIZE)), j, Block.TYPE.DIRT));
                                     }
                                 }
 
-                                Chunk chunk = new Chunk(blocks, new Vector3f(x*16,0, z*16));
+                                Chunk chunk = new Chunk(blocks, new Vector3f(x * CHUNK_SIZE, 0, z * CHUNK_SIZE));
                                 ChunkMesh chunkMesh = new ChunkMesh(chunk);
                                 chunksList.add(chunkMesh);
-                                occupiedChunkPos.add(new Vector3f(x * 16, 0, z * 16));
+                                occupiedChunkPos.add(new Vector3f(x * CHUNK_SIZE, 0, z * CHUNK_SIZE));
                             }
                         }
                     }
@@ -100,7 +105,7 @@ public class MainGameLoop {
             camera.move();
             camPos = camera.getPosition();
 
-            if(index < chunksList.size()){
+            if (index < chunksList.size()) {
 
                 RawModel model123 = loader.loadToVAO(chunksList.get(index).positions, chunksList.get(index).uvs);
                 TexturedModel texturedModel123 = new TexturedModel(model123, texture);
@@ -113,7 +118,7 @@ public class MainGameLoop {
                 index++;
             }
 
-              for (int i = 0; i < entities.size(); i++) {
+            for (int i = 0; i < entities.size(); i++) {
 
                 Vector3f origin = entities.get(i).getPosition();
                 int distX = (int) (camPos.x - origin.x);

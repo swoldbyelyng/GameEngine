@@ -20,7 +20,7 @@ public class MasterRenderer {
 
     private static final float FOV = 90;
     private static final float NEAR_PLANE = 0.01f;
-    private static final float FAR_PLANE = 100f;
+    private static final float FAR_PLANE = 1000f;
 
     StaticShader shader = new StaticShader();
     EntityRenderer entityRenderer = new EntityRenderer();
@@ -36,7 +36,7 @@ public class MasterRenderer {
 
     public void prepare() {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
-        GL11.glClearColor(1, 1, 0.6f, 0.2f);
+        GL11.glClearColor(0.5f, 0.75f, 0.9f, 0.2f);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     }
 
