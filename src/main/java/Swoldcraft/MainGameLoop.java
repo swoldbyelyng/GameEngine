@@ -1,7 +1,10 @@
 package Swoldcraft;
 
+import Chunks.Chunk;
+import Cube.Block;
 import Entities.Camera;
 import Entities.Entity;
+import Models.AtlasCubeModel;
 import Models.CubeModel;
 import Models.RawModel;
 import Models.TexturedModel;
@@ -24,8 +27,9 @@ public class MainGameLoop {
     static List<Chunk> chunksList = Collections.synchronizedList(new ArrayList<Chunk>());
     static Vector3f camPos = new Vector3f(0, 0, 0);
     static List<Vector3f> occupiedChunkPos = new ArrayList<Vector3f>();
-    static final int WORLD_SIZE = 30;
+    static final int WORLD_SIZE = 1 * 16;
 
+    static boolean closeDisplay = false;
 
     public static void main(String[] args) {
         DisplayManager.createDisplay();
@@ -88,7 +92,7 @@ public class MainGameLoop {
                 if (distZ < 0) {
                     distZ = -distZ;
                 }
-                if ((distX <= WORLD_SIZE) || (distZ <= WORLD_SIZE)) {
+                if ((distX <= WORLD_SIZE) && (distZ <= WORLD_SIZE)) {
                     for (int j = 0; j < chunksList.get(i).getBlocks().size(); j++) {
                         masterRenderer.addEntity(chunksList.get(i).getBlocks().get(j));
                     }
