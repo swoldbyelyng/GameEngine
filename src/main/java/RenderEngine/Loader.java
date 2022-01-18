@@ -25,14 +25,16 @@ public class Loader {
         bindAttribBuffer(vertices, 0, 3);
         bindAttribBuffer(uv, 1, 2);
         bindIndicesBuffer(indices);
+
         GL30.glBindVertexArray(0);
         return new RawModel(vaoID, indices.length);
     }
 
-    public RawModel loadToVAO(float[] vertices, float[] uv) {
+    public RawModel loadToVAO(float[] vertices, float[] uv, float[] normals) {
         int vaoID = createVAO();
         bindAttribBuffer(vertices, 0, 3);
         bindAttribBuffer(uv, 1, 2);
+        bindAttribBuffer(normals, 2 ,3);
         GL30.glBindVertexArray(0);
         return new RawModel(vaoID, vertices.length);
     }
@@ -69,7 +71,7 @@ public class Loader {
         int vboID = GL15.glGenBuffers();
         vbos.add(vboID);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboID);
-        FloatBuffer floatBuffer = converttoFloatBuffer(data);
+        FloatBuffer floatBuffer = convertToFloatBuffer(data);
 
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, floatBuffer, GL15.GL_STATIC_DRAW);
         GL20.glVertexAttribPointer(vaoIndexPos, dimensions, GL11.GL_FLOAT, false, 0, 0);
@@ -85,7 +87,7 @@ public class Loader {
         GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, intBuffer, GL15.GL_STATIC_DRAW);
     }
 
-    private FloatBuffer converttoFloatBuffer(float[] data) {
+    private FloatBuffer convertToFloatBuffer(float[] data) {
         FloatBuffer floatBuffer = BufferUtils.createFloatBuffer(data.length);
         floatBuffer.put(data);
         floatBuffer.flip();

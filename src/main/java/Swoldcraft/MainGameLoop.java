@@ -5,6 +5,7 @@ import Chunks.ChunkMesh;
 import Cube.Block;
 import Entities.Camera;
 import Entities.Entity;
+import Entities.Light;
 import Models.AtlasCubeModel;
 import Models.CubeModel;
 import Models.RawModel;
@@ -46,11 +47,16 @@ public class MainGameLoop {
         MasterRenderer masterRenderer = new MasterRenderer();
 
         RawModel model = loader.loadToVAO(CubeModel.vertices, CubeModel.indices, CubeModel.uv);
-        ModelTexture texture = new ModelTexture(loader.loadTexture("atlasTex"));
+        ModelTexture texture = new ModelTexture(loader.loadTexture("DefaultPack"));
+        texture.setReflectivity(0.5f);
+        texture.setShineDamper(10);
         TexturedModel texModel = new TexturedModel(model, texture);
 
-        Camera camera = new Camera(new Vector3f(0, 0, 0), 0, 0, 0);
+
+
+        Camera camera = new Camera(new Vector3f(0, 15, 0), 0, 0, 0);
         camPos = camera.getPosition();
+        Light light = new Light(new Vector3f(0, 30, 0), new Vector3f(1, 1, 1));
 
         PerlinNoiseGenerator generator = new PerlinNoiseGenerator();
 
@@ -66,7 +72,7 @@ public class MainGameLoop {
 
                                 for (int i = 0; i < CHUNK_SIZE; i++) {
                                     for (int j = 0; j < CHUNK_SIZE; j++) {
-                                        blocks.add(new Block(i, (int) generator.generateHeight(i + (x * CHUNK_SIZE), j + (z * CHUNK_SIZE)), j, Block.TYPE.DIRT));
+                                        blocks.add(new Block(i, (int) generator.generateHeight(i + (x * CHUNK_SIZE), j + (z * CHUNK_SIZE)), j, Block.GRASS));
                                     }
                                 }
 
@@ -104,11 +110,14 @@ public class MainGameLoop {
         while (!Display.isCloseRequested()) {
             camera.move();
             camPos = camera.getPosition();
+            //light.setPosition(camPos);
 
             if (index < chunksList.size()) {
 
-                RawModel model123 = loader.loadToVAO(chunksList.get(index).positions, chunksList.get(index).uvs);
+                RawModel model123 = loader.loadToVAO(chunksList.get(index).positions, chunksList.get(index).uvs, chunksList.get(index).normals);
                 TexturedModel texturedModel123 = new TexturedModel(model123, texture);
+
+
                 Entity entity123 = new Entity(texturedModel123, chunksList.get(index).chunk.origin, 0.f, 0.f, 0.f, 1.f);
                 entities.add(entity123);
 
@@ -135,7 +144,7 @@ public class MainGameLoop {
                 }
             }
             //masterRenderer.addEntity(entity);
-            masterRenderer.render(camera);
+            masterRenderer.render(camera, light);
 
             DisplayManager.updateDisplay();
         }
